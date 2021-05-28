@@ -4,10 +4,45 @@ const { SECRET_KEY } = require('../../config');
 const UserModel = require('../../models/Users');
 const { UserInputError } = require('apollo-server');
 
-const validateRegisterInput = require('../../helpers/validators');
+const { validateRegisterInput, validateLoginInput } = require('../../helpers/validators');
+
+function generateToken(user) {
+    return jwt.sign({
+        id: user.id,
+        email: user.email,
+        username: user.username
+    }, SECRET_KEY, { expiresIn: `1h` });
+}
 
 const resolver = {
     Mutation: {
+        async login(_, { username, password }) {
+            const { errors, valid } = validateLoginInput(username, password);
+            if (!valid) {
+                throw new UserInputError('Errors', { errors })
+            }
+
+            const user = await UserModel.findOne({ username });
+
+            if (!user) {
+                errors.general = 'User not found';
+                throw new UserInputError('User not found', { errors });
+            }
+
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) {
+                errors.general = 'User/Password does not match';
+                throw new UserInputError('User/Password does not match', { errors });
+            }
+
+            const token = generateToken(user);
+
+            return {
+                ...user._doc,
+                id: user._id,
+                token
+            }
+        },
         async register(_, { registerInput: { username, email, password, confirmPassword } }) {
 
             const { valid, errors } = validateRegisterInput(username, email, password, confirmPassword);
@@ -15,7 +50,7 @@ const resolver = {
                 throw new UserInputError('Errors', { errors })
             }
 
-            const user = await UserModel.findOne({ username });
+            let user = await UserModel.findOne({ username });
 
             if (user) {
                 throw new UserInputError('Username is taken', {
@@ -32,16 +67,12 @@ const resolver = {
                 createdAt: new Date().toISOString()
             });
 
-            const res = await newUser.save();
-            const token = jwt.sign({
-                id: res.id,
-                email: res.email,
-                username: res.username
-            }, SECRET_KEY, { expiresIn: `1h` });
+            user = await newUser.save();
+            const token = generateToken(user)
 
             return {
-                ...res._doc,
-                id: res._id,
+                ...user._doc,
+                id: user._id,
                 token
             }
         }
