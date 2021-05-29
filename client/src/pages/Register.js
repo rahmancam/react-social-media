@@ -1,24 +1,24 @@
 import { Form, Button } from 'semantic-ui-react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { gql, useMutation } from '@apollo/client';
-
+import { useForm } from '../hooks/useForm';
+import { AuthContext } from '../context/auth';
 
 function Register({ history }) {
     const [errors, setErrors] = useState({});
-    const [values, setValues] = useState({
+    const { login } = useContext(AuthContext);
+    const { values, onChange, onSubmit } = useForm(() => {
+        addUser();
+    }, {
         username: '',
         password: '',
         confirmPassword: '',
         email: '',
     });
 
-    function onChange(event) {
-        setValues({ ...values, [event.target.name]: event.target.value });
-    }
-
     const [addUser, { loading }] = useMutation(REGISTER_USER, {
-        update(proxy, result) {
-            console.log(result);
+        update(_, result) {
+            login(result.data.register)
             history.push('/');
         },
         onError(err) {
@@ -27,11 +27,6 @@ function Register({ history }) {
         },
         variables: values
     });
-
-    function onSubmit(event) {
-        event.preventDefault();
-        addUser()
-    }
 
     return (
         <div className="form-container">
