@@ -1,9 +1,21 @@
 import App from './App';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react'
+import { setContext, } from "@apollo/client/link/context";
+
+const authLink = setContext((request, previousContext) => {
+    const token = localStorage.getItem('token');
+    return {
+        headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }
+});
+
+const link = new HttpLink({
+    uri: "http://localhost:5000"
+});
 
 const client = new ApolloClient({
-    uri: 'http://localhost:5000',
+    link: authLink.concat(link),
     cache: new InMemoryCache()
 });
 
@@ -14,5 +26,6 @@ function Provider() {
         </ApolloProvider>
     );
 }
+
 
 export default Provider;
