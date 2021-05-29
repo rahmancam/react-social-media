@@ -4,6 +4,7 @@
   "description": "A simple social media app with react and graphql (merng) stack",
   "main": "index.js",
   "scripts": {
+    "serve": "node index",
     "start": "nodemon index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -29,6 +29,10 @@ const resolver = {
         async createPost(_, { body }, context) {
             const user = checkAuth(context);
 
+            if (body.trim() === '') {
+                throw new Error('Post body must not be empty');
+            }
+
             const newPost = new PostModel({
                 body,
                 user: user.id,
