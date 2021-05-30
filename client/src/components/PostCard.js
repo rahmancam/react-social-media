@@ -1,16 +1,13 @@
 import { Card, Icon, Button, Label, Image } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import { useContext } from 'react';
+import { AuthContext } from '../context/auth';
+import LikeButton from '../components/LikeButton';
 
 function PostCard({ post = {} }) {
     const { body, createdAt, id, username, likeCount, commentCount, likes } = post;
-
-    function likePost() {
-
-    }
-    function commentOnPost() {
-
-    }
+    const { user } = useContext(AuthContext);
 
     return (
         <Card fluid>
@@ -27,15 +24,8 @@ function PostCard({ post = {} }) {
                 </Card.Description>
             </Card.Content>
             <Card.Content extra>
-                <Button as='div' labelPosition='right' onClick={likePost}>
-                    <Button color='teal' basic>
-                        <Icon name='heart' />
-                    </Button>
-                    <Label basic color='teal' pointing='left'>
-                        {likeCount}
-                    </Label>
-                </Button>
-                <Button as='div' labelPosition='right' onClick={commentOnPost}>
+                <LikeButton post={{ id, likes, likeCount }} user={user} />
+                <Button labelPosition='right' as={Link} to={`/posts/${id}`}>
                     <Button color='blue' basic>
                         <Icon name='comments' />
                     </Button>
@@ -43,6 +33,15 @@ function PostCard({ post = {} }) {
                         {commentCount}
                     </Label>
                 </Button>
+                {user && user.username === username &&
+                    (
+                        <Button as='div'
+                            color='gray'
+                            floated='right'
+                            onClick={() => console.log('Delete')}>
+                            <Icon name="trash" />
+                        </Button>
+                    )}
             </Card.Content>
         </Card>
     )

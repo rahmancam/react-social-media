@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 const FETCH_POSTS_QUERY = gql`
-    {
+query getAllPosts {
         getPosts {
             id
             body 
@@ -9,6 +9,7 @@ const FETCH_POSTS_QUERY = gql`
             username
             likeCount
             likes {
+                id
                 username
             }
             commentCount
