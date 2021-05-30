@@ -11,19 +11,11 @@ function PostForm() {
 
     const [createPost, { error }] = useMutation(CREATE_POST_MUTATION, {
         variables: values,
-        optimisticResponse: {
-            createPost: {
-                id: '',
-                body: values.body,
-                username: values.username
-            }
-        },
         update(cache, result) {
-            const data = cache.readQuery({
-                query: FETCH_POSTS_QUERY
-            });
-            data.getPosts = [result.data.createPost, ...data.getPosts];
-            cache.writeQuery({ query: FETCH_POSTS_QUERY, data: { getPosts: data.getPosts } });
+            const data = cache.readQuery({ query: FETCH_POSTS_QUERY });
+            const newData = { ...data };
+            newData.getPosts = [result.data.createPost, ...data.getPosts];
+            cache.writeQuery({ query: FETCH_POSTS_QUERY, data: newData });
             values.body = '';
         },
         onError() {
@@ -50,7 +42,7 @@ function PostForm() {
                 error && (
                     <div className="ui error message" style={{ marginBottom: 20 }}>
                         <ui className="list">
-                            <li>{error.graphQLErrors[0].message}</li>
+                            <li>{error.graphQLErrors?.[0]?.message}</li>
                         </ui>
                     </div>
                 )
