@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "serve": "node index",
-    "start": "nodemon index",
+    "start": "node index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,6 +22,7 @@
   "dependencies": {
     "apollo-server": "^2.25.0",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
     "graphql": "^15.5.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.12",
