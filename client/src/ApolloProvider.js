@@ -11,7 +11,7 @@ const authLink = setContext((request, previousContext) => {
 });
 
 const link = new HttpLink({
-    uri: "http://localhost:5000"
+    uri: "https://social-one-app.herokuapp.com/"
 });
 
 const client = new ApolloClient({
